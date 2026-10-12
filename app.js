@@ -122,7 +122,8 @@ const server = createServer(async (req,res)=>{
     
 })
 
+const PORT = process.env.PORT || 3000
 
-server.listen(3000,(port)=>{
-    console.log(`Server listen in 3000`)
+server.listen(PORT,(port)=>{
+    console.log(`Server listen in ${PORT}`)
 })
