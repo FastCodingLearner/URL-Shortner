@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Card</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="card">
+        <h2>Create Account</h2>
+
+        <form id="submitForm" >
+            <label for="url">
+                URL :
+            <input type="url" name="url" id="url" placeholder="Enter your URL" required>
+                </label>
+                <label for="short-url">
+                    Short_URL : 
+            <input type="text" id="short-url" name="short-url" placeholder="Enter your short url" required>
+             </label>
+            <button  type="submit">Submit</button>
+        </form>
+
+        <footer>
+            <h3>Quick Links</h3>
+            <ul id="short-links">
+                <!-- <li><a href="#">Home</a></li> -->
+                Here lists
+            </ul>
+        </footer>
+    </div>
+
+    <script>
+
+        const setLinksFunc = async ()=>{
+            const res = await fetch('/links')
+            const data = await res.json()
+            const shortLinks = document.getElementById('short-links')
+            shortLinks.innerHTML=''
+             
+            for (const value in data) {
+                const li = document.createElement('li')
+                const link = data[value].length >= 30 ? `${data[value].slice(0,30)}...` : data[value]
+                
+                li.innerHTML = `<a href="${value}" target="_blank" >
+                    ${window.location.origin}/${value} :=> ${link}`
+                 shortLinks.appendChild(li)
+
+                
+            }
+        }
+        document.getElementById("submitForm").addEventListener("submit", async (event)=>{
+            event.preventDefault()
+             const data = new FormData(event.target)
+            const url = data.get('url')
+            const shortUrl = data.get('short-url')
+            //  console.log(url,shortUrl)
+            try {
+                const res = await fetch('/shorten',{
+                    method : "POST",
+                    headers :{"Content-Type":"application/json"},
+                    body : JSON.stringify({url,shortUrl})
+                })
+               
+                if(res.ok){
+                    setLinksFunc()
+                    alert("Form submitted successfully")
+                    event.target.reset()
+                }
+                else{
+                    const errorMessage = await res.text()
+                    alert(errorMessage)
+                }
+            } catch (error) {
+               alert(error.message)
+               
+
+                
+            }
+            
+            })
+
+            setLinksFunc()
+
+            </script>
+
+</body>
+</html>
